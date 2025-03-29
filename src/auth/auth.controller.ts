@@ -2,6 +2,7 @@ import { Controller, Get, Query, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { nanoid } from 'nanoid';
 import { AuthService } from './auth.service';
+import { ApiTags } from '@nestjs/swagger';
 
 /**
  * 리퀘스트에 쿠키 타입이 없어서 추가
@@ -10,6 +11,7 @@ interface RequestWithCookies extends Request {
   cookies: { [key: string]: string };
 }
 
+@ApiTags('Auth')
 @Controller('user/kakao')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -27,10 +29,12 @@ export class AuthController {
       res.cookie('kakao_auth_state', state, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'none',
         path: '/',
         maxAge: 300,
       });
+      console.log('[authorize] state:', state);
+      console.log('[authorize] 쿠키 설정 완료');
 
       const kakaoURL = this.authService.getKakaoRedirectURL(state);
       return res.redirect(kakaoURL);
@@ -89,14 +93,14 @@ export class AuthController {
       res.cookie('access_token', result.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'none',
         path: '/',
         maxAge: 60 * 15,
       });
       res.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'none',
         path: '/',
         maxAge: 3600 * 24 * 7,
       });

@@ -10,13 +10,13 @@ export class AuthService {
   getKakaoRedirectURL(state: string): string {
     const KAKAO_REST_API = process.env.KAKAO_REST_API;
     const CALLBACK_PATH = process.env.CALLBACK_PATH;
-    const FE_URI = process.env.FE_URI;
+    const BASE_URL = process.env.BASE_URL;
 
-    if (!KAKAO_REST_API || !CALLBACK_PATH || !FE_URI) {
+    if (!KAKAO_REST_API || !CALLBACK_PATH || !BASE_URL) {
       throw new Error('ENV 체크 필요');
     }
 
-    const REDIRECT_URI = `${FE_URI}${CALLBACK_PATH}`;
+    const REDIRECT_URI = `${BASE_URL}${CALLBACK_PATH}`;
 
     const kakaoAuthURL = new URL('https://kauth.kakao.com/oauth/authorize');
 
