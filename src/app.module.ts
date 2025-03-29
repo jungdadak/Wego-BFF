@@ -5,6 +5,7 @@ import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TrendingModule } from './trending/trending.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TrendingModule } from './trending/trending.module';
       serveRoot: '/static',
     }),
     TrendingModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
