@@ -37,20 +37,17 @@ export class AuthService {
   async exchangeCodeAndGetUserInfo(
     code: string,
   ): Promise<SpringTokenResponseDto> {
-    const SPRING_URL_NOSLASH = process.env.SPRING_URL_NOSLASH;
-    if (!SPRING_URL_NOSLASH) {
+    const SPRING_URL = process.env.SPRING_URL;
+    if (!SPRING_URL) {
       throw new Error('ENV 체크하세요');
     }
 
     try {
-      const springRes = await fetch(
-        `${SPRING_URL_NOSLASH}/api/user/kakao/callback`,
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ code }),
-        },
-      );
+      const springRes = await fetch(`${SPRING_URL}/api/user/kakao/callback`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
 
       if (!springRes.ok) {
         const text = await springRes.text();
