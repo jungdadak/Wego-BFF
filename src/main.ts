@@ -26,7 +26,7 @@ async function bootstrap() {
   app.enableCors({
     origin:
       process.env.NODE_ENV === 'production'
-        ? 'https://wego-travel.vercel.app'
+        ? ['https://wego-travel.vercel.app', 'https://wego-travel.click']
         : 'http://localhost:3000',
     credentials: true,
   });
