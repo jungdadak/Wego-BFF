@@ -22,5 +22,5 @@ jobs:
             git pull origin main
             pnpm install
             pnpm build
-            docker compose down
-            docker compose up -d --build
+            docker-compose down
+            docker-compose up -d --build
