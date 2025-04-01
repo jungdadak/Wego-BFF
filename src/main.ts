@@ -1,10 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
+
+  //Cors 설정 부분
+  app.enableCors({
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? ['https://wego-travel.vercel.app', 'https://wego-travel.click']
+        : 'http://localhost:3000',
+    credentials: true,
+  });
 
   // BE 에서 api 로 콜백 등록해주셔서 전체 적용 (nextjs 코드 변경 최소화도 유도)
   app.setGlobalPrefix('api');
@@ -21,14 +31,5 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document);
 
   await app.listen(process.env.PORT ?? 8080);
-  app.use(cookieParser());
-
-  app.enableCors({
-    origin:
-      process.env.NODE_ENV === 'production'
-        ? ['https://wego-travel.vercel.app', 'https://wego-travel.click']
-        : 'http://localhost:3000',
-    credentials: true,
-  });
 }
 bootstrap();
