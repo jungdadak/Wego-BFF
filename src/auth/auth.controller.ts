@@ -12,7 +12,7 @@ interface RequestWithCookies extends Request {
 }
 
 @ApiTags('Auth')
-@Controller('user/kakao')
+@Controller('user')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -21,7 +21,7 @@ export class AuthController {
    * nanoid 로 state 생성 후 카카오 Oauth URL 로 리디렉션.
    * @param res
    */
-  @Get('authorize')
+  @Get('kakao/authorize')
   async redirectToKakao(@Res() res: Response) {
     try {
       const state = nanoid();
@@ -58,7 +58,7 @@ export class AuthController {
    * @param req
    * @param res
    */
-  @Get('callback')
+  @Get('kakao/callback')
   async handleKakaoCallback(
     @Query('state') state: string,
     @Query('code') code: string,
@@ -113,6 +113,17 @@ export class AuthController {
       // 실패시에도 홈으로 리디렉션
       console.error('Spring 연동 실패:', err);
       return res.redirect(`${FE_URL}/?error=login_failed`);
+    }
+  }
+
+  @Get('me')
+  async handleMe(@Res() res: Response) {
+    if (process.env.IS_MOCKING === 'true') {
+      return res.status(200).json({
+        kakaoId: 'unknown123',
+        nickname: 'GUEST',
+        email: 'guest@example.com',
+      });
     }
   }
 }
