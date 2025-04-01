@@ -19,7 +19,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/Wego-BFF
-            git pull origin main
+            git fetch origin
+            git reset --hard origin/main
             pnpm install
             pnpm build
             docker-compose down
