@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { TrendingModule } from './trending/trending.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { HomeModule } from './home/home.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
     TrendingModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    HomeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

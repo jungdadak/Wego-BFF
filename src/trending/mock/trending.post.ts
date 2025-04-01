@@ -1,4 +1,4 @@
-const BASE_URL = 'https://gateway.wego-travel.click/'
+const BASE_URL = 'https://gateway.wego-travel.click/';
 
 export const mockTrendingPosts = [
   {
