@@ -31,7 +31,7 @@
     "@nestjs/testing": "^11.0.12",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.7",
-    "nanoid": "^5.1.5",
+    "nanoid": "^3.3.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "swagger-ui-express": "^5.0.1"
