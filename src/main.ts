@@ -9,10 +9,11 @@ async function bootstrap() {
 
   //Cors 설정 부분
   app.enableCors({
-    origin:
-      process.env.NODE_ENV === 'production'
-        ? ['https://wego-travel.vercel.app', 'https://wego-travel.click']
-        : 'http://localhost:3000',
+    origin: [
+      'https://wego-travel.vercel.app',
+      'https://www.wego-travel.click',
+      'https://wego-travel.click',
+    ],
     credentials: true,
   });
 
