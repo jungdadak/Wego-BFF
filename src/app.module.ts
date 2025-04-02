@@ -8,6 +8,7 @@ import { TrendingModule } from './trending/trending.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { HomeModule } from './home/home.module';
+import { DetailModule } from './detail/detail.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { HomeModule } from './home/home.module';
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     HomeModule,
+    DetailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

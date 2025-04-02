@@ -13,6 +13,7 @@ async function bootstrap() {
       'https://wego-travel.vercel.app',
       'https://www.wego-travel.click',
       'https://wego-travel.click',
+      'http://localhost:3000',
     ],
     credentials: true,
   });
@@ -33,4 +34,5 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 8080);
 }
+
 bootstrap();
