@@ -119,9 +119,9 @@ export class AuthController {
         email: 'guest@example.com',
       });
     }
-    const SPRING_BE_URL = process.env.SPRING_BE_URL;
+    const SPRING_URL = process.env.SPRING_BE_URL;
     try {
-      const springRes = await fetch(`${SPRING_BE_URL}`, {
+      const springRes = await fetch(`${SPRING_URL}/api/user/me`, {
         headers: {
           Authorization: req.headers['authorization'] ?? '',
         },
