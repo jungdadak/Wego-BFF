@@ -9,14 +9,25 @@ function getRandomContent() {
 
 let postIdCounter = 1;
 
+function getKSTAroundNow(offsetDays: number = 3): Date {
+  const now = new Date();
+  const kstOffsetMs = 9 * 60 * 60 * 1000;
+  const baseTime = now.getTime() + kstOffsetMs;
+
+  // -offsetDays ~ +offsetDays 사이에서 랜덤하게 선택
+  const randomOffsetMs =
+    (Math.random() * 2 * offsetDays - offsetDays) * 24 * 60 * 60 * 1000;
+
+  return new Date(baseTime + randomOffsetMs);
+}
+
 export const createMockPost = (overrides: Partial<PostDto> = {}): PostDto => ({
   postId: postIdCounter++,
   title: faker.lorem.words(5).slice(0, 32),
   filter: {
-    startDate: faker.date.soon(),
-    endDate: faker.date.soon(),
-    deadlineDate: faker.date.future(),
-    deadlineTime: '18:00',
+    startDate: getKSTAroundNow(3).toISOString(),
+    endDate: getKSTAroundNow(3).toISOString(),
+    deadlineDate: getKSTAroundNow(3).toISOString(),
     groupTheme: '여행 동행',
     groupSize: '4인',
     gender: '여자',

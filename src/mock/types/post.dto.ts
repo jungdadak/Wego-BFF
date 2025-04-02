@@ -3,16 +3,16 @@ import { ApiProperty } from '@nestjs/swagger';
 // 날짜 타입을 Date로 유지하는 필터 DTO
 export class FilterResponseDto {
   @ApiProperty({ example: new Date('2025-04-10'), description: '여행 시작일' })
-  startDate: Date;
+  startDate: string;
 
   @ApiProperty({ example: new Date('2025-04-15'), description: '여행 종료일' })
-  endDate: Date;
+  endDate: string;
 
-  @ApiProperty({ example: new Date('2025-04-01'), description: '모집 마감일' })
-  deadlineDate: Date;
-
-  @ApiProperty({ example: '18:00', description: '모집 마감 시간' })
-  deadlineTime: string;
+  @ApiProperty({
+    example: '2025-04-01T18:00:00.000Z',
+    description: '모집 마감일과 시간 (ISO 8601 형식)',
+  })
+  deadlineDateTime: string;
 
   @ApiProperty({ example: '여행 동행', description: '모임 테마' })
   groupTheme: string;
@@ -29,16 +29,13 @@ export class FilterResponseDto {
 
 export class FilterDto {
   @ApiProperty({ example: new Date('2025-04-10'), description: '여행 시작일' })
-  startDate: Date;
+  startDate: string;
 
   @ApiProperty({ example: new Date('2025-04-15'), description: '여행 종료일' })
-  endDate: Date;
+  endDate: string;
 
   @ApiProperty({ example: new Date('2025-04-01'), description: '모집 마감일' })
-  deadlineDate: Date;
-
-  @ApiProperty({ example: '18:00', description: '모집 마감 시간' })
-  deadlineTime: string;
+  deadlineDate: string;
 
   @ApiProperty({ example: '여행 동행', description: '모임 테마' })
   groupTheme: string;
