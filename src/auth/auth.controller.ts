@@ -3,13 +3,7 @@ import { Response } from 'express';
 import { nanoid } from 'nanoid';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
-
-/**
- * 리퀘스트에 쿠키 타입이 없어서 추가
- */
-interface RequestWithCookies extends Request {
-  cookies: { [key: string]: string };
-}
+import { RequestWithCookies } from '../types/req.types';
 
 @ApiTags('Auth')
 @Controller('user')
