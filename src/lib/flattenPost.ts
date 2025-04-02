@@ -10,7 +10,6 @@ export const flattenPost = (post: PostDto): PostResponseDto => ({
     startDate: post.filter.startDate,
     endDate: post.filter.endDate,
     deadlineDate: post.filter.deadlineDate,
-    deadlineTime: post.filter.deadlineTime,
     groupTheme: post.filter.groupTheme,
     groupSize: post.filter.groupSize,
     gender: post.filter.gender,

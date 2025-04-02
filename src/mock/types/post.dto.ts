@@ -12,7 +12,7 @@ export class FilterResponseDto {
     example: '2025-04-01T18:00:00.000Z',
     description: '모집 마감일과 시간 (ISO 8601 형식)',
   })
-  deadlineDateTime: string;
+  deadlineDate: string;
 
   @ApiProperty({ example: '여행 동행', description: '모임 테마' })
   groupTheme: string;
