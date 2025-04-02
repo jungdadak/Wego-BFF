@@ -3,13 +3,7 @@ import { Response } from 'express';
 import { nanoid } from 'nanoid';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
-
-/**
- * 리퀘스트에 쿠키 타입이 없어서 추가
- */
-interface RequestWithCookies extends Request {
-  cookies: { [key: string]: string };
-}
+import { RequestWithCookies } from '../types/req.types';
 
 @ApiTags('Auth')
 @Controller('user')
@@ -117,13 +111,37 @@ export class AuthController {
   }
 
   @Get('me')
-  async handleMe(@Res() res: Response) {
+  async handleMe(@Req() req: RequestWithCookies, @Res() res: Response) {
     if (process.env.IS_MOCKING === 'true') {
       return res.status(200).json({
         kakaoId: 'unknown123',
         nickname: 'GUEST',
         email: 'guest@example.com',
       });
+    }
+    const SPRING_BE_URL = process.env.SPRING_BE_URL;
+    try {
+      const springRes = await fetch(`${SPRING_BE_URL}`, {
+        headers: {
+          Authorization: req.headers['authorization'] ?? '',
+        },
+      });
+
+      if (!springRes.ok) {
+        return res
+          .status(springRes.status)
+          .json({ message: 'Spring 인증 실패' });
+      }
+
+      const user = await springRes.json();
+      return res.status(200).json({
+        kakaoId: user.kakaoId,
+        nickname: user.nickname,
+        email: user.email,
+      });
+    } catch (err) {
+      console.error('네트워크에러', err);
+      return res.status(500).json({ message: '유저 정보 불러오기 실패' });
     }
   }
 }
