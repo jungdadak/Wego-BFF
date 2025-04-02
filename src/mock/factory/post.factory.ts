@@ -34,7 +34,7 @@ export const createMockPost = (overrides: Partial<PostDto> = {}): PostDto => ({
   tags: ['#여행', '#맛집'],
   user: {
     kakaoId: faker.string.uuid(),
-    nickname: faker.internet.userName(),
+    nickname: faker.internet.username(),
     age: faker.number.int({ min: 10, max: 60 }),
     gender: faker.helpers.arrayElement(['남자', '여자']),
     profileImage: faker.image.avatar(),
