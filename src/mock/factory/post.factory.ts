@@ -19,7 +19,7 @@ export const createMockPost = (overrides: Partial<PostDto> = {}): PostDto => ({
     deadlineTime: '18:00',
     groupTheme: '여행 동행',
     groupSize: '4인',
-    gender: '여',
+    gender: '여자',
     age: ['20대'],
     ...(overrides.filter ?? {}),
   },

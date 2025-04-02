@@ -1,41 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-// 응답용 필터 DTO (문자열로 날짜 반환)
+// 날짜 타입을 Date로 유지하는 필터 DTO
 export class FilterResponseDto {
-  @ApiProperty({ example: '2025-04-10', description: '여행 시작일' })
-  startDate: string;
-
-  @ApiProperty({ example: '2025-04-15', description: '여행 종료일' })
-  endDate: string;
-
-  @ApiProperty({ example: '2025-04-01', description: '모집 마감일' })
-  deadlineDate: string;
-
-  @ApiProperty({ example: '18:00', description: '모집 마감 시간' })
-  deadlineTime: string;
-
-  @ApiProperty({ example: '여행 동행', description: '모임 테마' })
-  groupTheme: string;
-
-  @ApiProperty({ example: '4인', description: '모임 인원' })
-  groupSize: string;
-
-  @ApiProperty({ example: '여', description: '성별 제한', nullable: true })
-  gender: string | null;
-
-  @ApiProperty({ example: ['20대'], description: '나이대 제한' })
-  age: string[];
-}
-
-// 입력용 필터 DTO (Date 객체로 날짜 처리)
-export class FilterDto {
-  @ApiProperty({ example: '2025-04-10', description: '여행 시작일' })
+  @ApiProperty({ example: new Date('2025-04-10'), description: '여행 시작일' })
   startDate: Date;
 
-  @ApiProperty({ example: '2025-04-15', description: '여행 종료일' })
+  @ApiProperty({ example: new Date('2025-04-15'), description: '여행 종료일' })
   endDate: Date;
 
-  @ApiProperty({ example: '2025-04-01', description: '모집 마감일' })
+  @ApiProperty({ example: new Date('2025-04-01'), description: '모집 마감일' })
   deadlineDate: Date;
 
   @ApiProperty({ example: '18:00', description: '모집 마감 시간' })
@@ -47,7 +20,33 @@ export class FilterDto {
   @ApiProperty({ example: '4인', description: '모임 인원' })
   groupSize: string;
 
-  @ApiProperty({ example: '여', description: '성별 제한', nullable: true })
+  @ApiProperty({ example: '여자', description: '성별 제한', nullable: true })
+  gender: string | null;
+
+  @ApiProperty({ example: ['20대'], description: '나이대 제한' })
+  age: string[];
+}
+
+export class FilterDto {
+  @ApiProperty({ example: new Date('2025-04-10'), description: '여행 시작일' })
+  startDate: Date;
+
+  @ApiProperty({ example: new Date('2025-04-15'), description: '여행 종료일' })
+  endDate: Date;
+
+  @ApiProperty({ example: new Date('2025-04-01'), description: '모집 마감일' })
+  deadlineDate: Date;
+
+  @ApiProperty({ example: '18:00', description: '모집 마감 시간' })
+  deadlineTime: string;
+
+  @ApiProperty({ example: '여행 동행', description: '모임 테마' })
+  groupTheme: string;
+
+  @ApiProperty({ example: '4인', description: '모임 인원' })
+  groupSize: string;
+
+  @ApiProperty({ example: '여자', description: '성별 제한', nullable: true })
   gender: string | null;
 
   @ApiProperty({ example: ['20대'], description: '나이대 제한' })
@@ -122,7 +121,7 @@ export class PostDto {
   user: UserDto;
 }
 
-// 응답용 DTO
+// 응답용 DTO - 날짜를 Date 타입으로 유지
 export class PostResponseDto {
   @ApiProperty({ example: 1, description: '게시글 ID' })
   id: number;
@@ -169,7 +168,7 @@ export class PostResponseDto {
   @ApiProperty({ example: '여행 좋아해요~', description: '상태 메시지' })
   statusMessage: string;
 
-  @ApiProperty({ example: '20대', description: '사용자 나이' })
+  @ApiProperty({ example: 25, description: '사용자 나이' })
   userAge: number;
 
   @ApiProperty({ example: '여자', description: '사용자 성별' })

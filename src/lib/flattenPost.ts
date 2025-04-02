@@ -1,26 +1,15 @@
 import { PostDto, PostResponseDto } from '../mock/types/post.dto';
 
 /**
- * Date 객체를 YYYY-MM-DD 형식의 문자열로 변환
- */
-const formatDate = (date: Date): string => {
-  if (!date) return '';
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
-/**
  * PostDto를 PostResponseDto로 변환하는 함수
  */
 export const flattenPost = (post: PostDto): PostResponseDto => ({
   id: post.postId,
   title: post.title,
   filter: {
-    startDate: formatDate(post.filter.startDate),
-    endDate: formatDate(post.filter.endDate),
-    deadlineDate: formatDate(post.filter.deadlineDate),
+    startDate: post.filter.startDate,
+    endDate: post.filter.endDate,
+    deadlineDate: post.filter.deadlineDate,
     deadlineTime: post.filter.deadlineTime,
     groupTheme: post.filter.groupTheme,
     groupSize: post.filter.groupSize,
