@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { nanoid } from 'nanoid';
 import { AuthService } from './auth.service';
@@ -176,6 +176,69 @@ export class AuthController {
       console.error('네트워크 에러:', err);
       return res.status(500).json({
         message: '유저 정보 불러오기 실패',
+        error: err instanceof Error ? err.message : err,
+      });
+    }
+  }
+
+  @Post('logout')
+  async handleLogout(@Req() req: RequestWithCookies, @Res() res: Response) {
+    console.log('=== API/USER/LOGOUT 요청 시작 ===');
+    console.log('요청 쿠키:', req.cookies);
+
+    const SPRING_URL = process.env.SPRING_URL;
+
+    try {
+      // 여러 쿠키 키 확인
+      const accessToken =
+        req.cookies['accessToken'] || req.cookies['access_token'];
+
+      console.log('추출된 Access Token:', accessToken ? '존재함' : '없음');
+
+      if (!accessToken) {
+        console.warn('인증 토큰 없음');
+        return res.status(401).json({
+          message: '인증 토큰이 없습니다.',
+        });
+      }
+
+      console.log('Spring API 로그아웃 호출 시작');
+      const springRes = await fetch(`${SPRING_URL}/api/user/logout`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      console.log('Spring API 로그아웃 응답 상태:', springRes.status);
+
+      if (!springRes.ok) {
+        const errorText = await springRes.text();
+        console.error('Spring 로그아웃 실패:', {
+          status: springRes.status,
+          errorText,
+        });
+
+        return res.status(springRes.status).json({
+          message: 'Spring 로그아웃 실패',
+          details: errorText,
+        });
+      }
+
+      // 로그아웃 성공
+      console.log('로그아웃 성공');
+
+      // 토큰 날리기
+      res.clearCookie('accessToken');
+      res.clearCookie('refreshToken');
+
+      return res.status(200).json({
+        message: '로그아웃 성공',
+      });
+    } catch (err) {
+      console.error('네트워크 에러:', err);
+      return res.status(500).json({
+        message: '로그아웃 처리 실패',
         error: err instanceof Error ? err.message : err,
       });
     }
