@@ -90,7 +90,7 @@ export class AuthController {
         sameSite: 'none',
         path: '/',
         domain: '.wego-travel.click',
-        maxAge: 1500000,
+        maxAge: 1000 * 60 * 65, // 토큰 1시간
       });
       res.cookie('refreshToken', result.refreshToken, {
         httpOnly: true,
@@ -98,7 +98,7 @@ export class AuthController {
         sameSite: 'none',
         path: '/',
         domain: '.wego-travel.click',
-        maxAge: 3600 * 24 * 7 * 1000,
+        maxAge: 1000 * 60 * 60 * 24 * 7 + 1000, //리프레시 일주일
       });
       console.log('토큰들 장착 완료');
       // 닉네임과 이메일은 쿼리파라미터로 전송하기
