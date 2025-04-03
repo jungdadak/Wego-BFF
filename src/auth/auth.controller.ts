@@ -22,7 +22,7 @@ export class AuthController {
 
       res.cookie('kakao_auth_state', state, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: true,
         sameSite: 'none',
         path: '/',
         maxAge: 300000,
@@ -86,14 +86,14 @@ export class AuthController {
       // 토큰은 httponly 에 심고
       res.cookie('access_token', result.accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: true,
         sameSite: 'none',
         path: '/',
         maxAge: 1500000,
       });
       res.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: true,
         sameSite: 'none',
         path: '/',
         maxAge: 3600 * 24 * 7 * 1000,
