@@ -9,6 +9,7 @@ import { HomeModule } from './home/home.module';
 import { DetailModule } from './detail/detail.module';
 import { TokenMiddleware } from './auth/token.middleware';
 import { PostsModule } from './posts/posts.module';
+import { ClientsModule } from './lib/clients/clients.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PostsModule } from './posts/posts.module';
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/static',
     }),
+    ClientsModule,
     TrendingModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),

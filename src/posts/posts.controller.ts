@@ -4,8 +4,8 @@ import { mapToCreateSendDto } from './posts.mapper';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { extractTokens } from '../utils/extractAccessToken';
 import { RequestWithCookies } from '../types/req.types';
+import { extractTokens } from '../lib/utils/extractTokens';
 
 @Controller('posts')
 export class PostsController {
