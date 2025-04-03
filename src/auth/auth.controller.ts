@@ -112,13 +112,13 @@ export class AuthController {
 
   @Get('me')
   async handleMe(@Req() req: RequestWithCookies, @Res() res: Response) {
-    if (process.env.IS_MOCKING === 'true') {
-      return res.status(200).json({
-        kakaoId: 'unknown123',
-        nickname: 'GUEST',
-        email: 'guest@example.com',
-      });
-    }
+    // if (process.env.IS_MOCKING === 'true') {
+    //   return res.status(200).json({
+    //     kakaoId: 'unknown123',
+    //     nickname: 'GUEST',
+    //     email: 'guest@example.com',
+    //   });
+    // }
     const SPRING_URL = process.env.SPRING_URL;
     try {
       const springRes = await fetch(`${SPRING_URL}/api/user/me`, {
