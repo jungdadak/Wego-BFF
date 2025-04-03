@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { HomeModule } from './home/home.module';
 import { DetailModule } from './detail/detail.module';
 import { TokenMiddleware } from './auth/token.middleware';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TokenMiddleware } from './auth/token.middleware';
     ConfigModule.forRoot({ isGlobal: true }),
     HomeModule,
     DetailModule,
+    PostsModule,
   ],
   controllers: [],
   providers: [],
