@@ -120,29 +120,41 @@ export class AuthController {
     //     email: 'guest@example.com',
     //   });
     // }
+    console.log('=== API/USER/ME 요청 시작 ===');
+    console.log('요청 쿠키:', req.cookies);
+
     const SPRING_URL = process.env.SPRING_URL;
-    console.log('api/user/me 불림');
+    console.log('Spring URL:', SPRING_URL);
+
     try {
       // 여러 쿠키 키 확인
       const accessToken =
         req.cookies['accessToken'] || req.cookies['access_token'];
 
+      console.log('추출된 Access Token:', accessToken ? '존재함' : '없음');
+
       if (!accessToken) {
+        console.warn('인증 토큰 없음');
         return res.status(401).json({
           message: '인증 토큰이 없습니다.',
         });
       }
 
+      console.log('Spring API 호출 시작');
       const springRes = await fetch(`${SPRING_URL}/api/user/me`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
+      console.log('Spring API 응답 상태:', springRes.status);
+
       if (!springRes.ok) {
         const errorText = await springRes.text();
-        console.log('spring 인증 실패');
-        console.error('[ERROR] Full Error Response:', errorText);
+        console.error('Spring 인증 실패:', {
+          status: springRes.status,
+          errorText,
+        });
 
         return res.status(springRes.status).json({
           message: 'Spring 인증 실패',
@@ -151,15 +163,19 @@ export class AuthController {
       }
 
       const user = await springRes.json();
-      console.log('유저정보 bff가 바디로 보내드립니다.');
+      console.log('유저 정보 성공적으로 수신:', user);
+
       return res.status(200).json({
         kakaoId: user.kakaoId,
         nickname: user.nickname,
         email: user.email,
       });
     } catch (err) {
-      console.error('네트워크에러', err);
-      return res.status(500).json({ message: '유저 정보 불러오기 실패' });
+      console.error('네트워크 에러:', err);
+      return res.status(500).json({
+        message: '유저 정보 불러오기 실패',
+        error: err instanceof Error ? err.message : err,
+      });
     }
   }
 }
