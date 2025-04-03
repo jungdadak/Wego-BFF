@@ -123,23 +123,31 @@ export class AuthController {
     const SPRING_URL = process.env.SPRING_URL;
     console.log('api/user/me 불림');
     try {
-      console.log('[DEBUG] All Request Headers:', req.headers);
-      console.log(
-        '[DEBUG] Authorization Header:',
-        req.headers['authorization'],
-      );
+      // 여러 쿠키 키 확인
+      const accessToken =
+        req.cookies['accessToken'] || req.cookies['access_token'];
+
+      if (!accessToken) {
+        return res.status(401).json({
+          message: '인증 토큰이 없습니다.',
+        });
+      }
+
       const springRes = await fetch(`${SPRING_URL}/api/user/me`, {
         headers: {
-          Authorization: req.headers['authorization'] ?? '',
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      console.log('spring api/user/me 응답', springRes);
       if (!springRes.ok) {
+        const errorText = await springRes.text();
         console.log('spring 인증 실패');
-        return res
-          .status(springRes.status)
-          .json({ message: 'Spring 인증 실패' });
+        console.error('[ERROR] Full Error Response:', errorText);
+
+        return res.status(springRes.status).json({
+          message: 'Spring 인증 실패',
+          details: errorText,
+        });
       }
 
       const user = await springRes.json();

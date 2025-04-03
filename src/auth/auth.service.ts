@@ -51,13 +51,17 @@ export class AuthService {
 
       if (!springRes.ok) {
         const text = await springRes.text();
+        console.error('Spring 응답 오류:', text);
         throw new Error(`Spring 응답 오류: ${springRes.status} ${text}`);
       }
-      console.log(springRes.json());
-      return springRes.json();
+
+      // clone()을 사용하여 본문 재사용 가능하게 함
+      const responseText = await springRes.clone().text();
+      console.log('Spring 응답:', responseText);
+
+      return JSON.parse(responseText);
     } catch (err) {
       console.error('Spring 통신 실패:', err);
-      // 컨트롤러에서 처리해야 해서 다시던짐
       throw err;
     }
   }
