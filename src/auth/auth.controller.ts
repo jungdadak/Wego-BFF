@@ -89,6 +89,7 @@ export class AuthController {
         secure: true,
         sameSite: 'none',
         path: '/',
+        domain: '.wego-travel.click',
         maxAge: 1500000,
       });
       res.cookie('refreshToken', result.refreshToken, {
@@ -96,6 +97,7 @@ export class AuthController {
         secure: true,
         sameSite: 'none',
         path: '/',
+        domain: '.wego-travel.click',
         maxAge: 3600 * 24 * 7 * 1000,
       });
       console.log('토큰들 장착 완료');
