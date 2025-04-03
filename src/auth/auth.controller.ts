@@ -60,7 +60,7 @@ export class AuthController {
     @Res() res: Response,
   ) {
     const FE_URL = process.env.FE_URL ?? 'http://localhost:3000/';
-
+    console.log('콜백 시작');
     if (!code || !state) {
       return res.status(500).json({
         message: '서버 오류가 발생했습니다.',
@@ -76,7 +76,7 @@ export class AuthController {
       });
     }
     res.clearCookie('kakao_auth_state');
-
+    console.log('state 검증 완료');
     /**
      * spring 요청부 -> await 으로 스레드 블로킹
      */
@@ -84,21 +84,23 @@ export class AuthController {
       const result = await this.authService.exchangeCodeAndGetUserInfo(code);
 
       // 토큰은 httponly 에 심고
-      res.cookie('access_token', result.accessToken, {
+      res.cookie('accessToken', result.accessToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
         path: '/',
-        maxAge: 1500000,
+        domain: '.wego-travel.click',
+        maxAge: 1000 * 60 * 65, // 토큰 1시간
       });
-      res.cookie('refresh_token', result.refreshToken, {
+      res.cookie('refreshToken', result.refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
         path: '/',
-        maxAge: 3600 * 24 * 7 * 1000,
+        domain: '.wego-travel.click',
+        maxAge: 1000 * 60 * 60 * 24 * 7 + 1000, //리프레시 일주일
       });
-
+      console.log('토큰들 장착 완료');
       // 닉네임과 이메일은 쿼리파라미터로 전송하기
       return res.redirect(
         `${FE_URL}/?email=${encodeURIComponent(result.email)}&nickname=${encodeURIComponent(result.nickName)}`,
@@ -106,6 +108,7 @@ export class AuthController {
     } catch (err) {
       // 실패시에도 홈으로 리디렉션
       console.error('Spring 연동 실패:', err);
+      console.log('실패 리디렉션', err);
       return res.redirect(`${FE_URL}/?error=login_failed`);
     }
   }
@@ -119,29 +122,62 @@ export class AuthController {
     //     email: 'guest@example.com',
     //   });
     // }
-    const SPRING_URL = process.env.SPRING_BE_URL;
+    console.log('=== API/USER/ME 요청 시작 ===');
+    console.log('요청 쿠키:', req.cookies);
+
+    const SPRING_URL = process.env.SPRING_URL;
+    console.log('Spring URL:', SPRING_URL);
+
     try {
+      // 여러 쿠키 키 확인
+      const accessToken =
+        req.cookies['accessToken'] || req.cookies['access_token'];
+
+      console.log('추출된 Access Token:', accessToken ? '존재함' : '없음');
+
+      if (!accessToken) {
+        console.warn('인증 토큰 없음');
+        return res.status(401).json({
+          message: '인증 토큰이 없습니다.',
+        });
+      }
+
+      console.log('Spring API 호출 시작');
       const springRes = await fetch(`${SPRING_URL}/api/user/me`, {
         headers: {
-          Authorization: req.headers['authorization'] ?? '',
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
+      console.log('Spring API 응답 상태:', springRes.status);
+
       if (!springRes.ok) {
-        return res
-          .status(springRes.status)
-          .json({ message: 'Spring 인증 실패' });
+        const errorText = await springRes.text();
+        console.error('Spring 인증 실패:', {
+          status: springRes.status,
+          errorText,
+        });
+
+        return res.status(springRes.status).json({
+          message: 'Spring 인증 실패',
+          details: errorText,
+        });
       }
 
       const user = await springRes.json();
+      console.log('유저 정보 성공적으로 수신:', user);
+
       return res.status(200).json({
         kakaoId: user.kakaoId,
         nickname: user.nickname,
         email: user.email,
       });
     } catch (err) {
-      console.error('네트워크에러', err);
-      return res.status(500).json({ message: '유저 정보 불러오기 실패' });
+      console.error('네트워크 에러:', err);
+      return res.status(500).json({
+        message: '유저 정보 불러오기 실패',
+        error: err instanceof Error ? err.message : err,
+      });
     }
   }
 }

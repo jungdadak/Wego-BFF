@@ -26,7 +26,7 @@ async function bootstrap() {
     .setTitle('Wego BFF API')
     .setDescription('소셜 로그인, 인증, 기타 기능에 대한 API 문서')
     .setVersion('1.0')
-    .addCookieAuth('access_token') // 쿠키 기반 인증이면
+    .addCookieAuth('accessToken') // 쿠키 기반 인증이면
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
