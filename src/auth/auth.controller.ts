@@ -25,7 +25,7 @@ export class AuthController {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'none',
         path: '/',
-        maxAge: 300,
+        maxAge: 300000,
       });
       console.log('[authorize] state:', state);
       console.log('[authorize] 쿠키 설정 완료');
@@ -89,14 +89,14 @@ export class AuthController {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'none',
         path: '/',
-        maxAge: 60 * 15,
+        maxAge: 1500000,
       });
       res.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'none',
         path: '/',
-        maxAge: 3600 * 24 * 7,
+        maxAge: 3600 * 24 * 7 * 1000,
       });
 
       // 닉네임과 이메일은 쿼리파라미터로 전송하기
