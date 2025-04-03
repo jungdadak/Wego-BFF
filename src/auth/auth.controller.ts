@@ -115,37 +115,29 @@ export class AuthController {
 
   @Get('me')
   async handleMe(@Req() req: RequestWithCookies, @Res() res: Response) {
-    // if (process.env.IS_MOCKING === 'true') {
-    //   return res.status(200).json({
-    //     kakaoId: 'unknown123',
-    //     nickname: 'GUEST',
-    //     email: 'guest@example.com',
-    //   });
-    // }
     console.log('=== API/USER/ME 요청 시작 ===');
-    console.log('요청 쿠키:', req.cookies);
+    console.log('요청 헤더 Authorization:', req.headers['authorization']);
 
     const SPRING_URL = process.env.SPRING_URL;
-    console.log('Spring URL:', SPRING_URL);
 
     try {
-      // 여러 쿠키 키 확인
-      const accessToken =
-        req.cookies['accessToken'] || req.cookies['access_token'];
+      const authHeader = req.headers['authorization'];
 
-      console.log('추출된 Access Token:', accessToken ? '존재함' : '없음');
-
-      if (!accessToken) {
-        console.warn('인증 토큰 없음');
+      if (!authHeader) {
+        console.warn('Authorization 헤더 없음 (미들웨어 작동 안 함?)');
         return res.status(401).json({
-          message: '인증 토큰이 없습니다.',
+          message: 'Authorization 헤더가 없습니다.',
         });
       }
+      console.log(
+        '[Controller] Authorization 헤더 확인:',
+        req.headers['authorization'],
+      );
 
       console.log('Spring API 호출 시작');
       const springRes = await fetch(`${SPRING_URL}/api/user/me`, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: authHeader,
         },
       });
 
