@@ -12,7 +12,7 @@ export class TokenMiddleware implements NestMiddleware {
     const origin = (req.headers['origin'] ?? '') as string;
 
     if (origin && allowedOrigins.includes(origin)) {
-      const accessToken = req.cookies['access_token'];
+      const accessToken = req.cookies['accessToken'];
       if (accessToken) {
         req.headers['authorization'] = `Bearer ${accessToken}`;
       }

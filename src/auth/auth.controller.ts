@@ -84,14 +84,14 @@ export class AuthController {
       const result = await this.authService.exchangeCodeAndGetUserInfo(code);
 
       // 토큰은 httponly 에 심고
-      res.cookie('access_token', result.accessToken, {
+      res.cookie('accessToken', result.accessToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
         path: '/',
         maxAge: 1500000,
       });
-      res.cookie('refresh_token', result.refreshToken, {
+      res.cookie('refreshToken', result.refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
