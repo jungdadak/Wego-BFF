@@ -60,7 +60,7 @@ export class AuthController {
     @Res() res: Response,
   ) {
     const FE_URL = process.env.FE_URL ?? 'http://localhost:3000/';
-
+    console.log('콜백 시작');
     if (!code || !state) {
       return res.status(500).json({
         message: '서버 오류가 발생했습니다.',
@@ -76,7 +76,7 @@ export class AuthController {
       });
     }
     res.clearCookie('kakao_auth_state');
-
+    console.log('state 검증 완료');
     /**
      * spring 요청부 -> await 으로 스레드 블로킹
      */
@@ -98,7 +98,7 @@ export class AuthController {
         path: '/',
         maxAge: 3600 * 24 * 7 * 1000,
       });
-
+      console.log('토큰들 장착 완료');
       // 닉네임과 이메일은 쿼리파라미터로 전송하기
       return res.redirect(
         `${FE_URL}/?email=${encodeURIComponent(result.email)}&nickname=${encodeURIComponent(result.nickName)}`,
@@ -106,6 +106,7 @@ export class AuthController {
     } catch (err) {
       // 실패시에도 홈으로 리디렉션
       console.error('Spring 연동 실패:', err);
+      console.log('실패 리디렉션', err);
       return res.redirect(`${FE_URL}/?error=login_failed`);
     }
   }
@@ -120,20 +121,23 @@ export class AuthController {
     //   });
     // }
     const SPRING_URL = process.env.SPRING_URL;
+    console.log('api/user/me 불림');
     try {
       const springRes = await fetch(`${SPRING_URL}/api/user/me`, {
         headers: {
           Authorization: req.headers['authorization'] ?? '',
         },
       });
-
+      console.log('spring api/user/me 응답', springRes);
       if (!springRes.ok) {
+        console.log('spring 인증 실패');
         return res
           .status(springRes.status)
           .json({ message: 'Spring 인증 실패' });
       }
 
       const user = await springRes.json();
+      console.log('유저정보 bff가 바디로 보내드립니다.');
       return res.status(200).json({
         kakaoId: user.kakaoId,
         nickname: user.nickname,

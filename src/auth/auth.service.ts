@@ -53,6 +53,7 @@ export class AuthService {
         const text = await springRes.text();
         throw new Error(`Spring 응답 오류: ${springRes.status} ${text}`);
       }
+      console.log(springRes.json());
       return springRes.json();
     } catch (err) {
       console.error('Spring 통신 실패:', err);
