@@ -123,11 +123,17 @@ export class AuthController {
     const SPRING_URL = process.env.SPRING_URL;
     console.log('api/user/me 불림');
     try {
+      console.log('[DEBUG] All Request Headers:', req.headers);
+      console.log(
+        '[DEBUG] Authorization Header:',
+        req.headers['authorization'],
+      );
       const springRes = await fetch(`${SPRING_URL}/api/user/me`, {
         headers: {
           Authorization: req.headers['authorization'] ?? '',
         },
       });
+
       console.log('spring api/user/me 응답', springRes);
       if (!springRes.ok) {
         console.log('spring 인증 실패');
