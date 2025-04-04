@@ -140,6 +140,22 @@ export class AuthController {
 
       const user = springRes.data;
 
+      /**
+       * axios 인터셉터에서 리프레시 토큰을 config 에러객체에 끼워넣어두면
+       * 그걸 끌고와서 엑세스토큰을 갈아치움
+       */
+      const newToken = (springRes.config as any)._newAccessToken;
+      if (newToken) {
+        res.cookie('accessToken', newToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          path: '/',
+          domain: '.wego-travel.click',
+          maxAge: 1000 * 60 * 65,
+        });
+      }
+
       return res.status(200).json({
         kakaoId: user.kakaoId,
         nickname: user.nickname,
@@ -152,7 +168,6 @@ export class AuthController {
           message: err.response?.data || err.message,
         });
 
-        // ❗ Spring에서 401 왔을 경우에도 그대로 401 던짐 (프론트가 이미 핸들링 중이므로)
         return res.status(err.response?.status || 500).json({
           message: 'Spring 인증 실패',
           details: err.response?.data || err.message,
@@ -176,8 +191,7 @@ export class AuthController {
       return res.status(401).json({ message: 'AccessToken 누락됨' });
     }
 
-    // ❗ refreshToken도 필요 없으므로 안 꺼냄
-    const spring = new SpringApiService(); // ✅ 이제 생성자 인자 없어도 됨
+    const spring = new SpringApiService();
     const client = spring.toSpring();
 
     try {
