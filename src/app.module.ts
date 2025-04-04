@@ -10,7 +10,6 @@ import { DetailModule } from './detail/detail.module';
 import { TokenMiddleware } from './auth/token.middleware';
 import { FilterModule } from './filter/filter.module';
 import { PostsModule } from './posts/posts.module';
-import { ClientsModule } from './lib/clients/clients.module';
 
 @Module({
   imports: [
@@ -18,7 +17,6 @@ import { ClientsModule } from './lib/clients/clients.module';
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/static',
     }),
-    ClientsModule,
     TrendingModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),

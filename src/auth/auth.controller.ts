@@ -4,17 +4,15 @@ import { nanoid } from 'nanoid';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
 import { RequestWithCookies } from '../types/req.types';
-import { SpringApiService } from '../lib/clients/spring.axios.service';
 import axios from 'axios';
 import { extractAccessToken } from '../lib/utils/extractAccessToken';
+import { SpringApiService } from '../lib/clients/spring.axios.service';
+import { clearAuthCookies } from '../lib/utils/clearAuthCookies';
 
 @ApiTags('Auth')
 @Controller('user')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly springApiService: SpringApiService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   /**
    * 카카오로 유저를 리디렉션 하는 컨트롤러.
@@ -121,36 +119,26 @@ export class AuthController {
 
   @Get('me')
   async handleMe(@Req() req: RequestWithCookies, @Res() res: Response) {
-    console.log('=== API/USER/ME 요청 시작 ===');
-    console.log('요청 헤더 Authorization:', req.headers['authorization']);
+    const accessToken = extractAccessToken(req);
+    const refreshToken = req.cookies['refreshToken'];
+
+    if (!accessToken) {
+      return res.status(401).json({
+        message: 'AccessToken 없음',
+      });
+    }
+
+    const spring = new SpringApiService(refreshToken);
+    const client = spring.toSpring();
 
     try {
-      const authHeader = req.headers['authorization'];
+      const springRes = await client.get('/api/user/me', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-      if (!authHeader) {
-        console.warn('Authorization 헤더 없음 (미들웨어 작동 안 함?)');
-        return res.status(401).json({
-          message: 'Authorization 헤더가 없습니다.',
-        });
-      }
-      console.log(
-        '[Controller] Authorization 헤더 확인:',
-        req.headers['authorization'],
-      );
-
-      console.log('Spring API 호출 시작');
-      const springRes = await this.springApiService
-        .toSpring()
-        .get('/api/user/me', {
-          headers: {
-            Authorization: authHeader,
-          },
-        });
-
-      console.log('Spring API 응답 상태:', springRes.status);
-
-      const user = await springRes.data;
-      console.log('유저 정보 성공적으로 수신:', user);
+      const user = springRes.data;
 
       return res.status(200).json({
         kakaoId: user.kakaoId,
@@ -164,13 +152,13 @@ export class AuthController {
           message: err.response?.data || err.message,
         });
 
+        // ❗ Spring에서 401 왔을 경우에도 그대로 401 던짐 (프론트가 이미 핸들링 중이므로)
         return res.status(err.response?.status || 500).json({
           message: 'Spring 인증 실패',
           details: err.response?.data || err.message,
         });
       }
 
-      console.error('네트워크 에러:', err);
       return res.status(500).json({
         message: '유저 정보 불러오기 실패',
         error: err instanceof Error ? err.message : err,
@@ -181,14 +169,26 @@ export class AuthController {
   @Post('logout')
   async handleLogout(@Req() req: RequestWithCookies, @Res() res: Response) {
     console.log('=== API/USER/LOGOUT 요청 시작 ===');
-    console.log('요청 쿠키:', req.cookies);
 
-    const accessToken = extractAccessToken(req);
-    console.log('Access Token 확인됨');
+    // accessToken은 미들웨어에서 이미 Authorization 헤더로 세팅됨
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+      return res.status(401).json({ message: 'AccessToken 누락됨' });
+    }
+
+    // ❗ refreshToken도 필요 없으므로 안 꺼냄
+    const spring = new SpringApiService(); // ✅ 이제 생성자 인자 없어도 됨
+    const client = spring.toSpring();
 
     try {
       console.log('Spring API 로그아웃 호출 시작');
-      await this.springApiService.postLogout(accessToken);
+      await client.post(
+        '/api/user/logout',
+        {},
+        {
+          headers: { Authorization: authHeader },
+        },
+      );
       console.log('로그아웃 성공');
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -197,20 +197,8 @@ export class AuthController {
           errorText: err.response?.data,
         });
 
-        res.clearCookie('accessToken', {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          path: '/',
-          domain: '.wego-travel.click',
-        });
-        res.clearCookie('refreshToken', {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          path: '/',
-          domain: '.wego-travel.click',
-        });
+        // 실패해도 쿠키는 삭제
+        clearAuthCookies(res);
 
         return res.status(err.response?.status || 500).json({
           message: 'Spring 로그아웃 실패',
@@ -219,8 +207,7 @@ export class AuthController {
       }
 
       console.error('네트워크 에러:', err);
-      res.clearCookie('accessToken');
-      res.clearCookie('refreshToken');
+      clearAuthCookies(res);
 
       return res.status(500).json({
         message: '로그아웃 처리 실패',
@@ -228,21 +215,7 @@ export class AuthController {
       });
     }
 
-    res.clearCookie('accessToken', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      path: '/',
-      domain: '.wego-travel.click',
-    });
-    res.clearCookie('refreshToken', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      path: '/',
-      domain: '.wego-travel.click',
-    });
-
+    clearAuthCookies(res);
     return res.status(200).json({ message: '로그아웃 성공' });
   }
 }
