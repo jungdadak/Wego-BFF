@@ -197,8 +197,20 @@ export class AuthController {
           errorText: err.response?.data,
         });
 
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
+        res.clearCookie('accessToken', {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          path: '/',
+          domain: '.wego-travel.click',
+        });
+        res.clearCookie('refreshToken', {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          path: '/',
+          domain: '.wego-travel.click',
+        });
 
         return res.status(err.response?.status || 500).json({
           message: 'Spring 로그아웃 실패',
@@ -216,8 +228,20 @@ export class AuthController {
       });
     }
 
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+      domain: '.wego-travel.click',
+    });
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+      domain: '.wego-travel.click',
+    });
 
     return res.status(200).json({ message: '로그아웃 성공' });
   }
