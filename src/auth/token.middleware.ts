@@ -8,9 +8,15 @@ export class TokenMiddleware implements NestMiddleware {
     const accessToken =
       req.cookies['accessToken'] || req.cookies['access_token'];
 
-    // 토큰이 있을 때만 헤더 설정
+    // 미들웨어 동작 보는 부분
+    console.log('[TokenMiddleware] accessToken from cookie:', accessToken);
+
     if (accessToken) {
       req.headers['authorization'] = `Bearer ${accessToken}`;
+      console.log(
+        '[Middleware] Authorization 헤더 세팅 완료:',
+        req.headers['authorization'],
+      );
     }
 
     next();

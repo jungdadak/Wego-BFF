@@ -8,11 +8,9 @@ import { ConfigModule } from '@nestjs/config';
 import { HomeModule } from './home/home.module';
 import { DetailModule } from './detail/detail.module';
 import { TokenMiddleware } from './auth/token.middleware';
-<<<<<<< Updated upstream
-=======
-import { PostsModule } from './posts/posts.module';
 import { FilterModule } from './filter/filter.module';
->>>>>>> Stashed changes
+import { PostsModule } from './posts/posts.module';
+import { ClientsModule } from './lib/clients/clients.module';
 
 @Module({
   imports: [
@@ -20,16 +18,16 @@ import { FilterModule } from './filter/filter.module';
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/static',
     }),
+    ClientsModule,
     TrendingModule,
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     HomeModule,
     DetailModule,
-<<<<<<< Updated upstream
-=======
+    PostsModule,
+
     PostsModule,
     FilterModule,
->>>>>>> Stashed changes
   ],
   controllers: [],
   providers: [],

@@ -1,14 +1,20 @@
-import { Controller, Get, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { nanoid } from 'nanoid';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
 import { RequestWithCookies } from '../types/req.types';
+import { SpringApiService } from '../lib/clients/spring.axios.service';
+import axios from 'axios';
+import { extractAccessToken } from '../lib/utils/extractAccessToken';
 
 @ApiTags('Auth')
 @Controller('user')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly springApiService: SpringApiService,
+  ) {}
 
   /**
    * 카카오로 유저를 리디렉션 하는 컨트롤러.
@@ -115,56 +121,35 @@ export class AuthController {
 
   @Get('me')
   async handleMe(@Req() req: RequestWithCookies, @Res() res: Response) {
-    // if (process.env.IS_MOCKING === 'true') {
-    //   return res.status(200).json({
-    //     kakaoId: 'unknown123',
-    //     nickname: 'GUEST',
-    //     email: 'guest@example.com',
-    //   });
-    // }
     console.log('=== API/USER/ME 요청 시작 ===');
-    console.log('요청 쿠키:', req.cookies);
-
-    const SPRING_URL = process.env.SPRING_URL;
-    console.log('Spring URL:', SPRING_URL);
+    console.log('요청 헤더 Authorization:', req.headers['authorization']);
 
     try {
-      // 여러 쿠키 키 확인
-      const accessToken =
-        req.cookies['accessToken'] || req.cookies['access_token'];
+      const authHeader = req.headers['authorization'];
 
-      console.log('추출된 Access Token:', accessToken ? '존재함' : '없음');
-
-      if (!accessToken) {
-        console.warn('인증 토큰 없음');
+      if (!authHeader) {
+        console.warn('Authorization 헤더 없음 (미들웨어 작동 안 함?)');
         return res.status(401).json({
-          message: '인증 토큰이 없습니다.',
+          message: 'Authorization 헤더가 없습니다.',
         });
       }
+      console.log(
+        '[Controller] Authorization 헤더 확인:',
+        req.headers['authorization'],
+      );
 
       console.log('Spring API 호출 시작');
-      const springRes = await fetch(`${SPRING_URL}/api/user/me`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const springRes = await this.springApiService
+        .toSpring()
+        .get('/api/user/me', {
+          headers: {
+            Authorization: authHeader,
+          },
+        });
 
       console.log('Spring API 응답 상태:', springRes.status);
 
-      if (!springRes.ok) {
-        const errorText = await springRes.text();
-        console.error('Spring 인증 실패:', {
-          status: springRes.status,
-          errorText,
-        });
-
-        return res.status(springRes.status).json({
-          message: 'Spring 인증 실패',
-          details: errorText,
-        });
-      }
-
-      const user = await springRes.json();
+      const user = await springRes.data;
       console.log('유저 정보 성공적으로 수신:', user);
 
       return res.status(200).json({
@@ -173,11 +158,67 @@ export class AuthController {
         email: user.email,
       });
     } catch (err) {
+      if (axios.isAxiosError(err)) {
+        console.error('Spring 인증 실패:', {
+          status: err.response?.status,
+          message: err.response?.data || err.message,
+        });
+
+        return res.status(err.response?.status || 500).json({
+          message: 'Spring 인증 실패',
+          details: err.response?.data || err.message,
+        });
+      }
+
       console.error('네트워크 에러:', err);
       return res.status(500).json({
         message: '유저 정보 불러오기 실패',
         error: err instanceof Error ? err.message : err,
       });
     }
+  }
+
+  @Post('logout')
+  async handleLogout(@Req() req: RequestWithCookies, @Res() res: Response) {
+    console.log('=== API/USER/LOGOUT 요청 시작 ===');
+    console.log('요청 쿠키:', req.cookies);
+
+    const accessToken = extractAccessToken(req);
+    console.log('Access Token 확인됨');
+
+    try {
+      console.log('Spring API 로그아웃 호출 시작');
+      await this.springApiService.postLogout(accessToken);
+      console.log('로그아웃 성공');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        console.error('Spring 로그아웃 실패:', {
+          status: err.response?.status,
+          errorText: err.response?.data,
+        });
+
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken');
+
+        return res.status(err.response?.status || 500).json({
+          message: 'Spring 로그아웃 실패',
+          details: err.response?.data || err.message,
+        });
+      }
+
+      console.error('네트워크 에러:', err);
+      res.clearCookie('accessToken');
+      res.clearCookie('refreshToken');
+
+      return res.status(500).json({
+        message: '로그아웃 처리 실패',
+        error: err instanceof Error ? err.message : err,
+      });
+    }
+
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+
+    return res.status(200).json({ message: '로그아웃 성공' });
   }
 }
