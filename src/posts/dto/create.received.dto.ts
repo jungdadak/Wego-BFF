@@ -49,9 +49,8 @@ class FilterDto {
   @IsEnum(Gender)
   gender?: Gender;
 
-  @IsArray()
   @IsEnum(AgeGroup, { each: true })
-  age: AgeGroup[];
+  age: AgeGroup;
 }
 
 export class CreateReceivedDto {

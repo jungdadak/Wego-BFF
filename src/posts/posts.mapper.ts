@@ -27,11 +27,10 @@ function mapGender(gender?: string): CreateSendDto['preferredGender'] {
   return gender.toUpperCase() as CreateSendDto['preferredGender']; // 'male' → 'MALE'
 }
 
-function mapAgeGroup(ages: string[]): CreateSendDto['preferredAgeGroup'] {
-  if (ages.includes('notCare')) return 'ALL';
+function mapAgeGroup(age: string): CreateSendDto['preferredAgeGroup'] {
+  if (!age || age === 'notCare') return 'ALL';
 
-  const first = ages[0]; // 예: '10s'
-  switch (first) {
+  switch (age) {
     case '10s':
       return 'TEENS';
     case '20s':

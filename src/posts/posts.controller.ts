@@ -1,11 +1,11 @@
 import { Body, Controller, Post, Req } from '@nestjs/common';
 import { CreateReceivedDto } from './dto/create.received.dto';
 import { mapToCreateSendDto } from './posts.mapper';
-import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { RequestWithCookies } from '../types/req.types';
 import { extractTokens } from '../lib/utils/extractTokens';
+import { SpringApiService } from '../lib/clients/spring.axios.service';
 
 @Controller('posts')
 export class PostsController {
@@ -19,18 +19,16 @@ export class PostsController {
     @Body() dto: CreateReceivedDto,
     @Req() req: RequestWithCookies,
   ) {
-    const springUrl = this.configService.get<string>('SPRING_URL');
     const payload = mapToCreateSendDto(dto);
-
-    const { accessToken } = extractTokens(req);
-
-    const response = await firstValueFrom(
-      this.httpService.post(`${springUrl}/api/gatherings`, payload, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }),
-    );
+    const { accessToken, refreshToken } = extractTokens(req);
+    const spring = new SpringApiService(refreshToken);
+    const client = spring.toSpring();
+    console.log('게시물 요청 들어옴');
+    const response = await client.post('/api/gatherings', payload, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
     return response.data;
   }
