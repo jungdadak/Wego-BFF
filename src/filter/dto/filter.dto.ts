@@ -28,19 +28,19 @@ export class FilterDto {
 
   @IsOptional()
   @IsEnum(GroupTheme)
-  groupTheme?: string; // 여기서는 GroupTheme enum 값을 사용합니다
+  groupTheme?: GroupTheme; // 여기서는 GroupTheme enum 값을 사용합니다
 
   @IsOptional()
   @IsEnum(GroupSize)
-  groupSize?: string; // 여기서는 GroupSize enum 값을 사용합니다
+  groupSize?: GroupSize; // 여기서는 GroupSize enum 값을 사용합니다
 
   @IsOptional()
   @IsEnum(Gender)
-  gender?: string; // 여기서는 Gender enum 값을 사용합니다
+  gender?: Gender; // 여기서는 Gender enum 값을 사용합니다
 
   @IsOptional()
   @IsEnum(AgeGroup)
-  age?: string; // 여기서는 AgeGroup enum 값을 사용합니다
+  age?: AgeGroup; // 여기서는 AgeGroup enum 값을 사용합니다
 
   @IsOptional()
   @IsBoolean()

@@ -13,7 +13,7 @@ export function mapToCreateSendDto(input: CreateReceivedDto): CreateSendDto {
     lng: location.lng,
     startAt: filter.startDate.slice(0, 10),
     endAt: filter.endDate.slice(0, 10),
-    closedAt: `${filter.deadlineDate}T${filter.deadlineTime}`,
+    closedAt: `${filter.deadlineDate}`,
     maxParticipants: parseInt(filter.groupSize.replace(/\D/g, ''), 10),
     preferredGender: mapGender(filter.gender),
     preferredAgeGroup: mapAgeGroup(filter.age),
