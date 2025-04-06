@@ -3,8 +3,8 @@ export class CreateSendDto {
   content: string;
   thumbnailUrl?: string;
   address: string;
-  lat: number;
-  lng: number;
+  latitude: number;
+  longitude: number;
   startAt: string; // YYYY-MM-DD
   endAt: string;
   closedAt: string; // ISO 8601
