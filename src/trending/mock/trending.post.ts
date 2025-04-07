@@ -35,7 +35,7 @@ export const mockTrendingPosts = [
   },
   {
     id: 2,
-    title: '3/22~3/26 서울 맛집 탐방',
+    title: '서울 맛집 탐방',
     filter: {
       startDate: '2025-03-22T00:00:00.000Z',
       endDate: '2025-03-26T00:00:00.000Z',
