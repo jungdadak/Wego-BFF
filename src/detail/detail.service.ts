@@ -25,10 +25,10 @@ export class DetailService {
         startDate: data.startAt,
         endDate: data.endAt,
         deadlineDate: data.closedAt,
-        groupTheme: data.category,
+        groupTheme: toKoreanLabel(data.category, 'category'), // 한글로 변환
         groupSize: String(data.maxParticipants ?? 0),
-        gender: data.preferredGender ?? 'ANY',
-        age: [data.preferredAge ?? 'ALL'],
+        gender: toKoreanLabel(data.preferredGender ?? 'ANY', 'gender'), // 한글로 변환
+        age: [toKoreanLabel(data.preferredAgeGroup ?? 'ALL', 'age')], // 한글로 변환
       },
       location: {
         placeName: data.location,
@@ -39,16 +39,16 @@ export class DetailService {
       thumbnailUrl: data.thumbnailUrl,
       tags: data.hashtags ?? [],
 
-      currentMembers: 0, // 서버에 없으므로 기본값
+      currentMembers: 0,
       maxMembers: data.maxParticipants ?? 0,
 
       userId: '',
       userName: data.creator?.nickname ?? '',
       profileImage: data.creator?.thumbnailUrl ?? null,
       statusMessage: data.creator?.statusMessage ?? null,
-      userAge: data.creator?.ageGroup,
-      userGender: data.creator?.gender ?? null,
-      userRating: 4.5, //todo: 평점 api와 연결?
+      userAge: toKoreanLabel(data.creator?.ageGroup ?? 'ALL', 'age'),
+      userGender: toKoreanLabel(data.creator?.gender ?? 'ANY', 'gender'),
+      userRating: 4.5,
     };
   }
 }

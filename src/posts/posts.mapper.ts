@@ -63,7 +63,7 @@ function mapTheme(theme: string): CreateSendDto['category'] {
     case 'food':
       return 'RESTAURANT';
     case 'couple':
-      return 'COUPLE'; // 묶어서 처리 가능
+      return 'FAMILY'; // 묶어서 처리 가능
     default:
       return 'PART'; // fallback
   }

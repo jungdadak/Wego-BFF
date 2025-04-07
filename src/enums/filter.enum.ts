@@ -22,10 +22,10 @@ export enum AgeGroup {
 }
 
 export enum GroupTheme {
-  FRIENDS = 'friends',
-  COUPLE = 'couple',
+  PART = 'friends',
+  FAMILY = 'couple',
   TOUR = 'tour',
-  BOOKING = 'booking',
-  EVENT = 'event',
-  FOOD = 'food',
+  SHARE = 'booking',
+  SHOW = 'event',
+  RESTAURANT = 'food',
 }

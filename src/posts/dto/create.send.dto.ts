@@ -19,6 +19,6 @@ export class CreateSendDto {
     | 'FIFTIES'
     | 'SIXTIES'
     | 'SEVENTIES';
-  category: 'PART' | 'TOUR' | 'SHARE' | 'SHOW' | 'RESTAURANT' | 'COUPLE';
+  category: 'PART' | 'TOUR' | 'SHARE' | 'SHOW' | 'RESTAURANT' | 'FAMILY';
   hashtags: string[];
 }
