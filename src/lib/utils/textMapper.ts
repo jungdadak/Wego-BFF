@@ -24,7 +24,7 @@ const ageLabels: Record<string, string> = {
   SEVENTIES: '70대',
 };
 
-function toKoreanLabel(
+export function toKoreanLabel(
   value: string,
   type: 'category' | 'gender' | 'age',
 ): string {

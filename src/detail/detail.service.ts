@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { mockTrendingPosts } from '../trending/mock/trending.post';
+import { toKoreanLabel } from '../lib/utils/textMapper';
 
 @Injectable()
 export class DetailService {
