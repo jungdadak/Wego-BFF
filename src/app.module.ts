@@ -10,6 +10,7 @@ import { DetailModule } from './detail/detail.module';
 import { TokenMiddleware } from './auth/token.middleware';
 import { FilterModule } from './filter/filter.module';
 import { PostsModule } from './posts/posts.module';
+import { ProxyModule } from './proxy/proxy.module';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { PostsModule } from './posts/posts.module';
     HomeModule,
     DetailModule,
     PostsModule,
-
+    ProxyModule,
     PostsModule,
     FilterModule,
   ],
