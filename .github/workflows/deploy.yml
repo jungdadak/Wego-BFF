@@ -23,6 +23,6 @@ jobs:
             git reset --hard origin/main
             pnpm install
             pnpm build
-            docker-compose down
             docker-compose down --remove-orphans
+            docker system prune -af
             docker-compose up -d --build

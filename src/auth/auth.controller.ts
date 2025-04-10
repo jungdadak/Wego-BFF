@@ -31,8 +31,6 @@ export class AuthController {
         path: '/',
         maxAge: 300000,
       });
-      console.log('[authorize] state:', state);
-      console.log('[authorize] 쿠키 설정 완료');
 
       const kakaoURL = this.authService.getKakaoRedirectURL(state);
       return res.redirect(kakaoURL);
@@ -64,7 +62,6 @@ export class AuthController {
     @Res() res: Response,
   ) {
     const FE_URL = process.env.FE_URL ?? 'http://localhost:3000/';
-    console.log('콜백 시작');
     if (!code || !state) {
       return res.status(500).json({
         message: '서버 오류가 발생했습니다.',
@@ -80,7 +77,6 @@ export class AuthController {
       });
     }
     res.clearCookie('kakao_auth_state');
-    console.log('state 검증 완료');
     /**
      * spring 요청부 -> await 으로 스레드 블로킹
      */

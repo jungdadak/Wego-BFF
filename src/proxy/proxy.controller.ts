@@ -47,7 +47,6 @@ export class FallbackProxyController {
         params: req.query,
         // responseType: 'stream',
       });
-      console.log(`[PROXY] Spring에서 응답 수신: ${response.status}`);
 
       const customConfig = response.config as CustomAxiosRequestConfig;
       if (customConfig._newAccessToken) {
@@ -64,12 +63,10 @@ export class FallbackProxyController {
       // Spring 백엔드의 응답 스트림을 클라이언트로 그대로 전달
       res.json(response.data);
     } catch (error) {
-      console.error('[PROXY] 오류 발생:', error.message);
       if (error.code) console.error('[PROXY] 오류 코드:', error.code);
       if (error.request)
         console.error('[PROXY] 요청 정보:', error.request._currentUrl);
 
-      console.error('Proxy Error:', error?.response?.data || error);
       res.status(error?.response?.status || 500).json({
         message: '프록시 요청 실패',
         error: error?.response?.data || error?.message,
