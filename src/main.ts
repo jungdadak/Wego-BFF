@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
-import type { RequestHandler } from 'express';
 import * as express from 'express';
 import * as http from 'http';
 import * as httpProxy from 'http-proxy';
@@ -13,18 +12,7 @@ async function bootstrap() {
   const expressApp = express();
   expressApp.use(cookieParser());
 
-  // Nest 초기화 전 요청 차단 미들웨어
-  let nestReady = false;
-  const blockUntilReady: RequestHandler = (req, res, next): void => {
-    if (!nestReady) {
-      res.status(503).send('Nest application not ready');
-      return;
-    }
-    next();
-  };
-  expressApp.use(blockUntilReady);
-
-  //  ExpressAdapter로 감싸서 전달
+  // 👇 ExpressAdapter로 감싸서 전달
   const adapter = new ExpressAdapter(expressApp);
   const app = await NestFactory.create(AppModule, adapter);
 
@@ -56,9 +44,6 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document);
 
   await app.init();
-
-  // Nest 초기화 완료 후 요청 허용
-  nestReady = true;
 
   const proxy = httpProxy.createProxyServer({
     target: process.env.SPRING_URL,
