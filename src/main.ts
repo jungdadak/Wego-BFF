@@ -3,13 +3,14 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
+import * as httpProxy from 'http-proxy';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-  //Cors 설정 부분
+  // Cors 설정 부분
   app.enableCors({
     origin: [
       'https://wego-travel.vercel.app',
@@ -20,21 +21,56 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // BE 에서 api 로 콜백 등록해주셔서 전체 적용 (nextjs 코드 변경 최소화도 유도)
+  // API 경로 접두사 설정
   app.setGlobalPrefix('api');
 
-  // swagger 관련 설정
+  // Swagger 설정
   const config = new DocumentBuilder()
     .setTitle('Wego BFF API')
     .setDescription('소셜 로그인, 인증, 기타 기능에 대한 API 문서')
     .setVersion('1.0')
-    .addCookieAuth('accessToken') // 쿠키 기반 인증이면
+    .addCookieAuth('accessToken')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
 
-  await app.listen(process.env.PORT ?? 8080);
+  // NestJS 서버 시작
+  const server = await app.listen(process.env.PORT ?? 8080);
+
+  // HTTP 서버 인스턴스 가져오기
+  const httpServer = server.getHttpServer();
+
+  // WebSocket 프록시 설정
+  const proxy = httpProxy.createProxyServer({
+    target: process.env.SPRING_URL, // Spring 백엔드 URL
+    changeOrigin: true,
+    ws: true, // WebSocket 활성화
+  });
+
+  // WebSocket 연결 처리
+  httpServer.on('upgrade', (req, socket, head) => {
+    // WebSocket 경로 확인 (STOMP 프로토콜은 보통 특정 경로로 연결)
+    if (req.url?.startsWith('/ws/chat')) {
+      // 쿠키에서 토큰 추출
+      const cookieHeader = req.headers.cookie;
+      const tokenMatch =
+        cookieHeader?.match(/accessToken=([^;]+)/) ||
+        cookieHeader?.match(/access_token=([^;]+)/);
+
+      const accessToken = tokenMatch ? tokenMatch[1] : null;
+
+      // Authorization 헤더에 토큰 추가
+      if (accessToken) {
+        req.headers['authorization'] = `Bearer ${accessToken}`;
+      }
+
+      // WebSocket 연결 프록시
+      proxy.ws(req, socket, head);
+    }
+  });
+
+  console.log(`Application running on port ${process.env.PORT ?? 8080}`);
 }
 
 bootstrap();
