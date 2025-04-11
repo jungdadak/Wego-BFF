@@ -36,10 +36,10 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document);
 
   // NestJS 서버 시작
-  const server = await app.listen(process.env.PORT ?? 8080);
+  await app.listen(process.env.PORT ?? 8080);
 
-  // HTTP 서버 인스턴스 가져오기
-  const httpServer = server.getHttpServer();
+  // NestJS의 HTTP 서버 인스턴스를 올바르게 가져오는 방법
+  const httpServer = app.getHttpServer();
 
   // WebSocket 프록시 설정
   const proxy = httpProxy.createProxyServer({
