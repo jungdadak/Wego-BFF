@@ -8,9 +8,6 @@ export class TokenMiddleware implements NestMiddleware {
     const accessToken =
       req.cookies['accessToken'] || req.cookies['access_token'];
 
-    // 미들웨어 동작 보는 부분
-    console.log('[TokenMiddleware] accessToken from cookie:', accessToken);
-
     if (accessToken) {
       req.headers['authorization'] = `Bearer ${accessToken}`;
       console.log(

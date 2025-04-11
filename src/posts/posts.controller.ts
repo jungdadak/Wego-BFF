@@ -23,7 +23,6 @@ export class PostsController {
     const { accessToken, refreshToken } = extractTokens(req);
     const spring = new SpringApiService(refreshToken);
     const client = spring.toSpring();
-    console.log('게시물 요청 들어옴');
     const response = await client.post('/api/gatherings', payload, {
       headers: {
         Authorization: `Bearer ${accessToken}`,

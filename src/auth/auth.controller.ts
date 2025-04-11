@@ -100,15 +100,12 @@ export class AuthController {
         domain: '.wego-travel.click',
         maxAge: 1000 * 60 * 60 * 24 * 7 + 1000, //리프레시 일주일
       });
-      console.log('토큰들 장착 완료');
       // 닉네임과 이메일은 쿼리파라미터로 전송하기
       return res.redirect(
         `${FE_URL}/?email=${encodeURIComponent(result.email)}&nickname=${encodeURIComponent(result.nickName)}`,
       );
-    } catch (err) {
+    } catch {
       // 실패시에도 홈으로 리디렉션
-      console.error('Spring 연동 실패:', err);
-      console.log('실패 리디렉션', err);
       return res.redirect(`${FE_URL}/?error=login_failed`);
     }
   }
@@ -179,8 +176,6 @@ export class AuthController {
 
   @Post('logout')
   async handleLogout(@Req() req: RequestWithCookies, @Res() res: Response) {
-    console.log('=== API/USER/LOGOUT 요청 시작 ===');
-
     // accessToken은 미들웨어에서 이미 Authorization 헤더로 세팅됨
     const authHeader = req.headers['authorization'];
     if (!authHeader) {
@@ -191,7 +186,6 @@ export class AuthController {
     const client = spring.toSpring();
 
     try {
-      console.log('Spring API 로그아웃 호출 시작');
       await client.post(
         '/api/user/logout',
         {},
@@ -199,14 +193,8 @@ export class AuthController {
           headers: { Authorization: authHeader },
         },
       );
-      console.log('로그아웃 성공');
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        console.error('Spring 로그아웃 실패:', {
-          status: err.response?.status,
-          errorText: err.response?.data,
-        });
-
         // 실패해도 쿠키는 삭제
         clearAuthCookies(res);
 
@@ -216,7 +204,6 @@ export class AuthController {
         });
       }
 
-      console.error('네트워크 에러:', err);
       clearAuthCookies(res);
 
       return res.status(500).json({

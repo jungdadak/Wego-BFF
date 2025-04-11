@@ -9,8 +9,6 @@ import {
 export class FallbackProxyController {
   @All('*')
   async proxy(@Req() req: Request, @Res() res: Response) {
-    console.log(`[PROXY] 요청 시작: ${req.method} ${req.originalUrl}`);
-    console.log(`[PROXY] 요청 헤더:`, req.headers);
     // 기존에 컨트롤러가 처리하는 경로들은 제외
     const excludedRoutes = [
       /^\/api\/user/,
@@ -32,10 +30,6 @@ export class FallbackProxyController {
     const client = createProxyAxiosInstance(refreshToken);
 
     try {
-      console.log(
-        `[PROXY] Spring으로 요청 전송: ${req.method} ${process.env.SPRING_URL}${req.originalUrl}`,
-      );
-
       const response = await client.request({
         method: req.method,
         url: req.originalUrl, // 필요한 경우 URL 재매핑 로직 추가 가능
@@ -65,12 +59,10 @@ export class FallbackProxyController {
     } catch (error) {
       if (error.code) console.error('[PROXY] 오류 코드:', error.code);
       if (error.request)
-        console.error('[PROXY] 요청 정보:', error.request._currentUrl);
-
-      res.status(error?.response?.status || 500).json({
-        message: '프록시 요청 실패',
-        error: error?.response?.data || error?.message,
-      });
+        res.status(error?.response?.status || 500).json({
+          message: '프록시 요청 실패',
+          error: error?.response?.data || error?.message,
+        });
     }
   }
 }
