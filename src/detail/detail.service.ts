@@ -43,7 +43,7 @@ export class DetailService {
       currentMembers: 0,
       maxMembers: data.maxParticipants ?? 0,
 
-      userId: '',
+      kakaoId: data.creator.kakaoId,
       userName: data.creator?.nickname ?? '',
       profileImage: data.creator?.thumbnailUrl ?? null,
       statusMessage: data.creator?.statusMessage ?? null,
