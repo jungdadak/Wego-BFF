@@ -15,7 +15,7 @@ export class FallbackProxyController {
       /^\/api\/detail/,
       /^\/api\/trending/,
       /^\/api\/posts/,
-      /^\/api\/filter/,
+      // /^\/api\/filter/,
     ];
     const path = req.originalUrl;
     if (excludedRoutes.some((regex) => regex.test(path))) {
