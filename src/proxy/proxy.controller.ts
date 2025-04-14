@@ -38,7 +38,7 @@ export class FallbackProxyController {
           host: undefined,
         },
         data: req.body,
-        params: req.query,
+        // params: req.query,
         // responseType: 'stream',
       });
 
