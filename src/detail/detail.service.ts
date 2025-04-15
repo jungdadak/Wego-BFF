@@ -49,7 +49,8 @@ export class DetailService {
       statusMessage: data.creator?.statusMessage ?? null,
       userAge: toKoreanLabel(data.creator?.ageGroup ?? 'ALL', 'age'),
       userGender: toKoreanLabel(data.creator?.gender ?? 'ANY', 'gender'),
-      userRating: 4.5,
+      userRating: data.creator.averageRating,
+      totalReviews: data.creator.totalReviews,
     };
   }
 }
